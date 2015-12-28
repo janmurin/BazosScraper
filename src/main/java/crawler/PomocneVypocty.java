@@ -5,6 +5,8 @@
  */
 package crawler;
 
+import deprecated.TextDatabase;
+
 /**
  *
  * @author Janco1

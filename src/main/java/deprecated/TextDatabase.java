@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package backup;
+package deprecated;
 
-import crawler.*;
+import crawler.Inzerat;
+import crawler.Kategoria;
+import crawler.Okres;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -80,15 +82,14 @@ public class TextDatabase {
             try {
                 out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(TEXT_DATABASE_DIR + "/" + name + ".txt", true), "UTF-8"));
                 for (Inzerat inz : zoznam) {
-                    out.write(inz.getTextString() + "\n");
+                    out.write(inz.getTextString()+"\n");
                 }
                 out.flush();
-            } catch (Exception ex) {
-                try {
-                    zaloguj("inzertInzeraty vynimka: " + ex, true);
-                } catch (InterruptedException ex1) {
-                    Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                }
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
                 Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 if (out != null) {
@@ -137,23 +138,14 @@ public class TextDatabase {
                     novy.setDatumInzeratu(parts[11]);
                     inzeraty.add(novy);
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("getInzeratyList vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-
+                    Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
                     break;
                 }
             }
-        } catch (Exception ex) {
-            try {
-                zaloguj("getInzeratyList vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return inzeraty;
@@ -187,28 +179,20 @@ public class TextDatabase {
                     }
                     inzeraty.add(parts[6]);
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("getInzeratyUrls vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
                     break;
                 }
             }
-        } catch (Exception ex) {
-            try {
-                zaloguj("getInzeratyUrls vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return inzeraty;
     }
 
-    public synchronized String getLastTimeInserted() {
+    synchronized String getLastTimeInserted() {
         File file = new File(TEXT_DATABASE_DIR + "/data.txt");
 
         BufferedReader f = null;
@@ -225,41 +209,21 @@ public class TextDatabase {
                     sb.append(line + "\n");
 
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("getLastTimeInserted vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
                     break;
                 }
             }
             return sb.toString().split("\n")[0].split("=")[1];
-        } catch (Exception ex) {
-            try {
-                zaloguj("getLastTimeInserted vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return "unknown";
     }
 
-    public void zaloguj(String message, boolean poslatGui) throws InterruptedException {
-        System.out.println(message);
-        if (poslatGui) {
-            try {
-                Shared.logMessages.put(message);
-            } catch (InterruptedException ex) {
-                //Logger.getLogger(UrlSearcher.class.getName()).log(Level.SEVERE, null, ex);
-                throw ex;
-            }
-        }
-    }
-
-    public synchronized String getLastKontrola() {
+    synchronized String getLastKontrola() {
         File file = new File(TEXT_DATABASE_DIR + "/data.txt");
 
         BufferedReader f = null;
@@ -276,71 +240,54 @@ public class TextDatabase {
                     sb.append(line + "\n");
 
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("getLastKontrola vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
                     break;
                 }
             }
             return sb.toString().split("\n")[1].split("=")[1];
-        } catch (Exception ex) {
-            try {
-                zaloguj("getLastKontrola vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return "unknown";
     }
 
-    synchronized int getInzeratyPocet() {
-        File file = new File(TEXT_DATABASE_DIR);
-
-        int pocet = 0;
-        for (File subor : file.listFiles()) {
-            if (subor.getName().contains("data") || subor.getName().contains("okresy")) {
-                continue;
-            }
-            BufferedReader f = null;
-            try {
-                f = new BufferedReader(new InputStreamReader(new FileInputStream(subor), "UTF8"));
-                while (true) {
-                    try {
-                        String line = f.readLine();
-                        if (line == null || line.length() == 0) {
-                            break;
-                        }
-                        pocet++;
-
-                    } catch (Exception ex) {
-                        try {
-                            zaloguj("getInzeratyPocet vynimka: " + ex, true);
-                        } catch (InterruptedException ex1) {
-                            Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                        }
-                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                        break;
-                    }
-                }
-
-            } catch (Exception ex) {
-                try {
-                    zaloguj("getInzeratyPocet vynimka: " + ex, true);
-                } catch (InterruptedException ex1) {
-                    Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                }
-                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        return pocet;
-    }
-
+//    int getInzeratyPocet() {
+//        File file = new File(TEXT_DATABASE_DIR);
+//
+//        int pocet = 0;
+//        for (File subor : file.listFiles()) {
+//            if (subor.getName().contains("data") || subor.getName().contains("okresy")) {
+//                continue;
+//            }
+//            BufferedReader f = null;
+//            try {
+//                f = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"));
+//                while (true) {
+//                    try {
+//                        String line = f.readLine();
+//                        if (line == null || line.length() == 0) {
+//                            break;
+//                        }
+//                        pocet++;
+//
+//                    } catch (Exception ex) {
+//                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+//                        break;
+//                    }
+//                }
+//
+//            } catch (FileNotFoundException ex) {
+//                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (UnsupportedEncodingException ex) {
+//                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+//
+//        return pocet;
+//    }
     synchronized private void initOkresneMesta() {
         System.out.println("nacitavam okresne mesta");
         File file = new File(TEXT_DATABASE_DIR + "/okresy.txt");
@@ -364,23 +311,15 @@ public class TextDatabase {
                     okresy.add(new Okres(split[0], split[1]));
 
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("initOkresneMesta vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
                     break;
                 }
             }
             System.out.println("skoncene citanie okresnych miest");
-        } catch (Exception ex) {
-            try {
-                zaloguj("initOkresneMesta vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -425,37 +364,28 @@ public class TextDatabase {
                         platneInzeraty.add(novy);
                     }
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("deleteInzeratyWithUrl vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
                     break;
                 }
             }
-        } catch (Exception ex) {
-            try {
-                zaloguj("deleteInzeratyWithUrl vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         Writer out = null;
         try {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(TEXT_DATABASE_DIR + "/" + name + ".txt"), "UTF-8"));
             for (Inzerat inz : platneInzeraty) {
-                out.write(inz.getTextString() + "\n");
+                out.write(inz.getTextString()+"\n" );
             }
             out.flush();
-        } catch (Exception ex) {
-            try {
-                zaloguj("deleteInzeratyWithUrl vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (out != null) {
@@ -469,7 +399,7 @@ public class TextDatabase {
 
     }
 
-    public synchronized void updateLastKontrola() {
+    synchronized void updateLastKontrola() {
         File file = new File(TEXT_DATABASE_DIR + "/data.txt");
 
         StringBuilder sb = new StringBuilder();
@@ -487,35 +417,19 @@ public class TextDatabase {
                     sb.append(line + "\n");
 
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("updateLastKontrola vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
                     break;
                 }
             }
 
-        } catch (Exception ex) {
-            try {
-                zaloguj("updateLastKontrola vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        try {
-            if (sb.toString().split("\n").length < 2) {
-                throw new RuntimeException("poskodene data v subore data.txt");
-            }
-        } catch (RuntimeException ex) {
-            try {
-                zaloguj("updateLastKontrola vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+        if (sb.toString().split("\n").length < 2) {
+            throw new RuntimeException("poskodene data v subore data.txt");
         }
 
         String novy = sb.toString().split("\n")[0] + "\nlastKontrola=" + getTimestamp();
@@ -525,12 +439,11 @@ public class TextDatabase {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(TEXT_DATABASE_DIR + "/data.txt"), "UTF-8"));
             out.write(novy);
             out.flush();
-        } catch (Exception ex) {
-            try {
-                zaloguj("updateLastKontrola vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (out != null) {
@@ -561,35 +474,19 @@ public class TextDatabase {
                     sb.append(line + "\n");
 
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("updateLastTimeInserted vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
                     break;
                 }
             }
 
-        } catch (Exception ex) {
-            try {
-                zaloguj("updateLastTimeInserted vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainForm2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        try {
-            if (sb.toString().split("\n").length < 2) {
-                throw new RuntimeException("poskodene data v subore data.txt");
-            }
-        } catch (RuntimeException ex) {
-            try {
-                zaloguj("updateLastTimeInserted vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+        if (sb.toString().split("\n").length < 2) {
+            throw new RuntimeException("poskodene data v subore data.txt");
         }
 
         String novy = "lastTimeInserted=" + getTimestamp() + "\n" + sb.toString().split("\n")[1];
@@ -599,12 +496,11 @@ public class TextDatabase {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(TEXT_DATABASE_DIR + "/data.txt"), "UTF-8"));
             out.write(novy);
             out.flush();
-        } catch (Exception ex) {
-            try {
-                zaloguj("updateLastTimeInserted vynimka: " + ex, true);
-            } catch (InterruptedException ex1) {
-                Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (out != null) {

@@ -65,11 +65,11 @@ public class CrawlerManagerTask implements Runnable {
         this.aktualizujeme = false;
     }
 
-    public CrawlerManagerTask(backup.TextDatabase database, int searcherov, int crawlerov, int pocetDni) {
+    public CrawlerManagerTask(deprecated.TextDatabase database, int searcherov, int crawlerov, int pocetDni) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public CrawlerManagerTask(backup.TextDatabase database, int searcherov) {
+    public CrawlerManagerTask(deprecated.TextDatabase database, int searcherov) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -138,7 +138,9 @@ public class CrawlerManagerTask implements Runnable {
             // este pockame na crawlerov nech dokoncia crawlovanie
             crawlerGate.await();
 
-            System.out.println("TOTAL TIME: " + Utils.getElapsedTime(startTime));
+            //System.out.println("TOTAL TIME: " + Utils.getElapsedTime(startTime));
+            zaloguj("Aktualizacia ukoncena, Čas trvania: " + Utils.getElapsedTime(startTime), true);
+            zaloguj("naslo sa " + Shared.crawlerNasiel + " novych inzeratov.", true);
             Shared.logMessages.put("poison.pill");
 
         } catch (InterruptedException e) {
@@ -205,7 +207,7 @@ public class CrawlerManagerTask implements Runnable {
             //Shared.urlsToAnalyze.put(new CrawlerUloha("poison.pill", kategorie.get(0), "default datum"));
             List<List<CrawlerUloha>> crawlerUlohy = new ArrayList<>();
             for (Kategoria kategoria : kategorie) {
-                crawlerUlohy.add(new ArrayList<>());
+                crawlerUlohy.add(new ArrayList<CrawlerUloha>());
             }
             // teraz budem prechadzat cely rad a porozdelujem ich do listov podla kategorii
             for (CrawlerUloha cu : Shared.urlsToAnalyze) {
@@ -217,6 +219,7 @@ public class CrawlerManagerTask implements Runnable {
             }
 
             System.out.println("TOTAL TIME: " + Utils.getElapsedTime(startTime));
+            zaloguj("Aktualizacia ukoncena, Čas trvania: " + Utils.getElapsedTime(startTime), true);
             Shared.logMessages.put("poison.pill");
 
         } catch (InterruptedException e) {
@@ -403,7 +406,7 @@ public class CrawlerManagerTask implements Runnable {
 //        
 //        StringBuilder sql = new StringBuilder();
 //        int packet_size=500;
-        for (int j=0; j<cm.kategorie.size(); j++) {
+        for (int j = 0; j < cm.kategorie.size(); j++) {
             Kategoria kat = cm.kategorie.get(j);
             Shared.db.getInzeratyUrls(kat);
         }

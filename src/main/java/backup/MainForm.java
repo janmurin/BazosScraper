@@ -5,8 +5,9 @@
  */
 package backup;
 
+import crawler.TextDatabase;
 import crawler.*;
-import static crawler.TextDatabase.TEXT_DATABASE_DIR;
+import static deprecated.TextDatabase.TEXT_DATABASE_DIR;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -71,32 +72,32 @@ public class MainForm extends javax.swing.JFrame {
             
             poslednyUpdateLabel.setText("Posledná aktualizácia: " + poslednyInsert + " (pred " + Utils.getElapsedTime(lastInsertDate.getTime()) + " )");
             poslednaKontrolaLabel.setText("Posledná kontrola: " + poslednaKontrola + " (pred " + Utils.getElapsedTime(lastKontrolaDate.getTime()) + " )");
-           // nastavButtony(false);
-//            SwingWorker<Void, String> aktualizaciaWorker = new SwingWorker<Void, String>() {
-//                
-//                @Override
-//                protected Void doInBackground() throws Exception {
-//                    zapisDoLogu("hladam inzeratov v DB");
-//                    inzeratyPocet = database.getInzeratyPocet();
-//                    zapisDoLogu("inzeratov v DB je: " + inzeratyPocet);
-//                    publish("inzeratov v DB: " + inzeratyPocet);
-//                    return null;
-//                }
-//                
-//                @Override
-//                protected void process(List<String> chunks) {
-//                    for (String str : chunks) {
-//                        inzeratovVDBLabel.setText(str);
-//                    }
-//                }
-//                
-//                @Override
-//                protected void done() {
-//                    nastavButtony(true);
-//                }
-//                
-//            };
-//            aktualizaciaWorker.execute();
+            nastavButtony(false);
+            SwingWorker<Void, String> aktualizaciaWorker = new SwingWorker<Void, String>() {
+                
+                @Override
+                protected Void doInBackground() throws Exception {
+                    zapisDoLogu("hladam inzeratov v DB");
+                    inzeratyPocet = database.getInzeratyPocet();
+                    zapisDoLogu("inzeratov v DB je: " + inzeratyPocet);
+                    publish("inzeratov v DB: " + inzeratyPocet);
+                    return null;
+                }
+                
+                @Override
+                protected void process(List<String> chunks) {
+                    for (String str : chunks) {
+                        inzeratovVDBLabel.setText(str);
+                    }
+                }
+                
+                @Override
+                protected void done() {
+                    nastavButtony(true);
+                }
+                
+            };
+            aktualizaciaWorker.execute();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(rootPane, "vynimka: "+e);
         }

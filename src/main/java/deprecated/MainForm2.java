@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package crawler;
+package deprecated;
 
-import static crawler.TextDatabase.TEXT_DATABASE_DIR;
+import crawler.Inzerat;
+import crawler.Utils;
+import static deprecated.TextDatabase.TEXT_DATABASE_DIR;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,7 +36,7 @@ import javax.swing.SwingWorker;
  *
  * @author Janco1
  */
-public class MainForm extends javax.swing.JFrame {
+public class MainForm2 extends javax.swing.JFrame {
 
     private final TextDatabase database;
         private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -42,7 +44,7 @@ public class MainForm extends javax.swing.JFrame {
     /**
      * Creates new form MainForm
      */
-    public MainForm() {
+    public MainForm2() {
         initComponents();
         this.database = new TextDatabase();
         setLocationRelativeTo(null);
@@ -60,7 +62,7 @@ public class MainForm extends javax.swing.JFrame {
             System.out.println("diffDni: " + diffDni);
 
         } catch (ParseException ex) {
-            Logger.getLogger(AktualizaciaFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AktualizaciaFrame2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         poslednyUpdateLabel.setText("Posledná aktualizácia: " + poslednyInsert + " (pred " + Utils.getElapsedTime(lastInsertDate.getTime()) + " )");
@@ -253,7 +255,7 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void spustiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spustiButtonActionPerformed
-        AktualizaciaFrame aktualizaciaFrame = new AktualizaciaFrame(database,0);
+        AktualizaciaFrame2 aktualizaciaFrame = new AktualizaciaFrame2(database,0);
         aktualizaciaFrame.setVisible(true);
     }//GEN-LAST:event_spustiButtonActionPerformed
 
@@ -426,20 +428,21 @@ public class MainForm extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainForm2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainForm().setVisible(true);
+                new MainForm2().setVisible(true);
             }
         });
     }

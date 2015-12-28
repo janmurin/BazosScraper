@@ -3,8 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package crawler;
+package deprecated;
 
+import crawler.AktualizaciaStatus;
+import crawler.CrawlerManagerTask;
+import crawler.Shared;
+import crawler.Utils;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
@@ -27,7 +31,7 @@ import javax.swing.SwingWorker;
  *
  * @author Janco1
  */
-public class AktualizaciaFrame extends javax.swing.JFrame {
+public class AktualizaciaFrame2 extends javax.swing.JFrame {
 
     private final TextDatabase database;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -42,7 +46,7 @@ public class AktualizaciaFrame extends javax.swing.JFrame {
      *
      * @param database
      */
-    public AktualizaciaFrame(TextDatabase database, int pocet) {
+    public AktualizaciaFrame2(TextDatabase database, int pocet) {
         initComponents();
         setLocationRelativeTo(null);
 
@@ -63,8 +67,13 @@ public class AktualizaciaFrame extends javax.swing.JFrame {
             System.out.println("diffDni: " + diffDni);
 
         } catch (ParseException ex) {
-            Logger.getLogger(AktualizaciaFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AktualizaciaFrame2.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        if (currentDate.after(maxDate)) {
+//            JOptionPane.showMessageDialog(rootPane, "vyprsala platnost programu");
+//            nastavButtony(false);
+//            return;
+//        }
 //        if (currentDate.after(maxDate)) {
 //            JOptionPane.showMessageDialog(rootPane, "vyprsala platnost programu");
 //            nastavButtony(false);
@@ -431,7 +440,7 @@ public class AktualizaciaFrame extends javax.swing.JFrame {
                     }
                     System.out.println("AktualizaciaFrame logWorker: ziadne dalsie message");
                 } catch (Exception e) {
-                    Logger.getLogger(AktualizaciaFrame.class.getName()).log(Level.SEVERE, null, e);
+                    Logger.getLogger(AktualizaciaFrame2.class.getName()).log(Level.SEVERE, null, e);
                 }
                 return null;
             }
@@ -513,7 +522,7 @@ public class AktualizaciaFrame extends javax.swing.JFrame {
                     }
                     System.out.println("AktualizaciaFrame logWorker: ziadne dalsie message");
                 } catch (Exception e) {
-                    Logger.getLogger(AktualizaciaFrame.class.getName()).log(Level.SEVERE, null, e);
+                    Logger.getLogger(AktualizaciaFrame2.class.getName()).log(Level.SEVERE, null, e);
                 }
                 return null;
             }
@@ -560,21 +569,23 @@ public class AktualizaciaFrame extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AktualizaciaFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AktualizaciaFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AktualizaciaFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AktualizaciaFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AktualizaciaFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AktualizaciaFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AktualizaciaFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AktualizaciaFrame2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AktualizaciaFrame(new TextDatabase(),0).setVisible(true);
+                new AktualizaciaFrame2(new TextDatabase(),0).setVisible(true);
             }
         });
     }
