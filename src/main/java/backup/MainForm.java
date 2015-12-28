@@ -65,16 +65,16 @@ public class MainForm extends javax.swing.JFrame {
                 lastKontrolaDate = sdf.parse(poslednaKontrola);
                 diffDni = (int) Math.ceil((currentDate.getTime() - lastInsertDate.getTime()) / (1000 * 60 * 60 * 24.0));
                 System.out.println("diffDni: " + diffDni);
-                
+
             } catch (ParseException ex) {
                 Logger.getLogger(AktualizaciaFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             poslednyUpdateLabel.setText("Posledná aktualizácia: " + poslednyInsert + " (pred " + Utils.getElapsedTime(lastInsertDate.getTime()) + " )");
             poslednaKontrolaLabel.setText("Posledná kontrola: " + poslednaKontrola + " (pred " + Utils.getElapsedTime(lastKontrolaDate.getTime()) + " )");
             nastavButtony(false);
             SwingWorker<Void, String> aktualizaciaWorker = new SwingWorker<Void, String>() {
-                
+
                 @Override
                 protected Void doInBackground() throws Exception {
                     zapisDoLogu("hladam inzeratov v DB");
@@ -83,23 +83,23 @@ public class MainForm extends javax.swing.JFrame {
                     publish("inzeratov v DB: " + inzeratyPocet);
                     return null;
                 }
-                
+
                 @Override
                 protected void process(List<String> chunks) {
                     for (String str : chunks) {
                         inzeratovVDBLabel.setText(str);
                     }
                 }
-                
+
                 @Override
                 protected void done() {
                     nastavButtony(true);
                 }
-                
+
             };
             aktualizaciaWorker.execute();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(rootPane, "vynimka: "+e);
+            JOptionPane.showMessageDialog(rootPane, "vynimka: " + e);
         }
     }
 
@@ -354,11 +354,7 @@ public class MainForm extends javax.swing.JFrame {
                     }
                     out.flush();
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("MainForm vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
+                    JOptionPane.showMessageDialog(rootPane, "MainForm vynimka: " + ex);
                     Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
                     if (out != null) {
@@ -383,6 +379,11 @@ public class MainForm extends javax.swing.JFrame {
             @Override
             protected void done() {
                 nastavButtony(true);
+                try {
+                    Shared.logMessages.put("poison.pill");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
         };
@@ -404,11 +405,7 @@ public class MainForm extends javax.swing.JFrame {
                     }
                     System.out.println("MainForm logWorker: ziadne dalsie message");
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("MainForm vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
+                    JOptionPane.showMessageDialog(rootPane, "MainForm vynimka: " + ex);
                     Logger.getLogger(AktualizaciaFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 return null;
@@ -420,6 +417,7 @@ public class MainForm extends javax.swing.JFrame {
                     zapisDoLogu(m);
                 }
             }
+
         };
         logWorker.execute();
         System.out.println("logWorker executed");
@@ -442,20 +440,31 @@ public class MainForm extends javax.swing.JFrame {
                     Matcher m;
                     String RE_MAIL = "([\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[A-Za-z]{2,4})";
                     p = Pattern.compile(RE_MAIL);
-                    for (File subor : file.listFiles()) {
-                        if (subor.getName().contains("data") || subor.getName().contains("okresy")) {
-                            continue;
-                        }
-                        publish("hladam emaily v " + subor.getName());
-                        List<Inzerat> inzeratyList = database.getInzeratyList(subor.getName().replace(".txt", ""));
-                        for (Inzerat inz : inzeratyList) {
-                            m = p.matcher(inz.getEmail());
-                            while (m.find()) {
-                                String addr = m.group(1);
-                                emaily.add(addr);
-                                emailyString.add(addr);
+                    try {
+                        for (File subor : file.listFiles()) {
+                            if (subor.getName().contains("data") || subor.getName().contains("okresy")) {
+                                continue;
+                            }
+                            publish("hladam emaily v " + subor.getName());
+                            List<Inzerat> inzeratyList = database.getInzeratyList(subor.getName().replace(".txt", ""));
+                            System.out.println("prehladavam " + inzeratyList.size() + " inzeratov");
+                            publish("prehladavam " + inzeratyList.size() + " inzeratov");
+                            int c = 0;
+                            for (Inzerat inz : inzeratyList) {
+                                c++;
+                                m = p.matcher(inz.getEmail());
+                                while (m.find()) {
+                                    String addr = m.group(1);
+                                    emaily.add(addr);
+                                    emailyString.add(addr);
+                                }
+//                                if (c % 2000 == 0) {
+//                                    publish(c + "/" + inzeratyList.size());
+//                                }
                             }
                         }
+                    } catch (Exception e) {
+                        publish("vynimka: " + e);
                     }
                     publish("najdenych inzeratov s emailom: " + emailyString.size() + "/" + inzeratyPocet);
                     publish("najdenych emailov: " + emaily.size() + " zapisujem emaily do suboru uloha2output.txt");
@@ -466,11 +475,7 @@ public class MainForm extends javax.swing.JFrame {
                     }
                     out.flush();
                 } catch (Exception ex) {
-                    try {
-                        zaloguj("MainForm vynimka: " + ex, true);
-                    } catch (InterruptedException ex1) {
-                        Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
+                    JOptionPane.showMessageDialog(rootPane, "MainForm vynimka: " + ex);
                     Logger.getLogger(TextDatabase.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
                     if (out != null) {
@@ -495,29 +500,52 @@ public class MainForm extends javax.swing.JFrame {
             @Override
             protected void done() {
                 nastavButtony(true);
+                try {
+                    Shared.logMessages.put("poison.pill");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
         aktualizaciaWorker.execute();
 
+        SwingWorker<Void, String> logWorker = new SwingWorker<Void, String>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+                    String message = Shared.logMessages.take();
+                    System.out.println("MainForm logWorker: prvy message prijaty: " + message);
+                    while (message != null) {
+                        if (message.equals("poison.pill")) {
+                            break;
+                        }
+                        //System.out.println("publishujem message: " + message);
+                        publish(message);
+                        message = Shared.logMessages.take();
+                    }
+                    System.out.println("MainForm logWorker: ziadne dalsie message");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(rootPane, "MainForm vynimka: " + ex);
+                    Logger.getLogger(AktualizaciaFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return null;
+            }
 
+            @Override
+            protected void process(List<String> chunks) {
+                for (String m : chunks) {
+                    zapisDoLogu(m);
+                }
+            }
+        };
+        logWorker.execute();
+        System.out.println("logWorker executed");
     }//GEN-LAST:event_uloha2ButtonActionPerformed
 
     private void zapisDoLogu(String text) {
         //System.out.println(text);
         logTextArea.append(text + "\n");
         logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
-    }
-
-    public void zaloguj(String message, boolean poslatGui) throws InterruptedException {
-        System.out.println(message);
-        if (poslatGui) {
-            try {
-                Shared.logMessages.put(message);
-            } catch (InterruptedException ex) {
-                //Logger.getLogger(UrlSearcher.class.getName()).log(Level.SEVERE, null, ex);
-                throw ex;
-            }
-        }
     }
 
     /**

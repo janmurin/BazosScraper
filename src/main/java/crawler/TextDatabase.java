@@ -113,7 +113,10 @@ public class TextDatabase {
         BufferedReader f = null;
         try {
             f = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"));
+            System.out.println("otvoreny subor: " + file.getName());
+            int riadok = 0;
             while (true) {
+                riadok++;
                 StringTokenizer st = null;
                 String line = f.readLine();
                 if (line == null || line.length() == 0) {
@@ -121,7 +124,9 @@ public class TextDatabase {
                 }
                 String[] parts = line.split("\\|");
                 if (parts.length != 12) {
-                    throw new RuntimeException("poskodeny riadok, pocet stlpov != 12");
+                    //throw new RuntimeException("poskodeny riadok, pocet stlpov != 12, casti: " + parts.length + " riadok: " + riadok + " subor: " + file.getName());
+                    zaloguj("poskodeny riadok, pocet stlpov != 12, casti: " + parts.length + " riadok: " + riadok + " subor: " + file.getName(), true);
+                    continue;
                 }
                 Inzerat novy = new Inzerat();
                 novy.setPortal(parts[0]);
@@ -138,6 +143,7 @@ public class TextDatabase {
                 novy.setDatumInzeratu(parts[11]);
                 inzeraty.add(novy);
             }
+            System.out.println("nacitanych inzeratov: " + inzeraty.size());
         } catch (Exception ex) {
             try {
                 zaloguj("getInzeratyList vynimka: " + ex, true);
@@ -173,7 +179,9 @@ public class TextDatabase {
                 }
                 String[] parts = line.split("\\|");
                 if (parts.length != 12) {
-                    throw new RuntimeException("poskodeny riadok, pocet stlpov != 12, casti: " + parts.length + " riadok: " + riadok + " subor: " + file.getName());
+                    //throw new RuntimeException("poskodeny riadok, pocet stlpov != 12, casti: " + parts.length + " riadok: " + riadok + " subor: " + file.getName());
+                    zaloguj("poskodeny riadok, pocet stlpov != 12, casti: " + parts.length + " riadok: " + riadok + " subor: " + file.getName(), true);
+                    continue;
                 }
                 inzeraty.add(parts[6]);
             }
