@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 
 /**
@@ -55,7 +56,17 @@ class UrlCrawler implements Runnable {
                     break;
                 }
                 // System.out.println("crawlujem url: "+uloha.url);
-                Document page = jsoup.getPage(uloha.url);
+                Document page = null;
+                try {
+                    page = jsoup.getPage(uloha.url);
+                } catch (Status400Exception ex) {
+                    zaloguj("crawler " + this.id + " INZERAT PRAVDEPODOBNE NEEXISTUJE  url: " + uloha.url + " pricina: " + ex, true);
+                    continue;
+                } catch (Exception ex) {
+                    zaloguj("crawler " + this.id + " NEPODARILO SA ZISKAT STRANKU: " + uloha.url + " pricina: " + ex, true);
+                    continue;
+                }
+                // pre istotu necham aj tuto podmienku
                 if (page == null) {
                     zaloguj("crawler " + this.id + " NEPODARILO SA ZISKAT STRANKU: " + uloha.url, true);
                     continue;
@@ -102,7 +113,7 @@ class UrlCrawler implements Runnable {
         novy.setPortal(uloha.kategoria.url);
         novy.setDatumInzeratu(uloha.datum);
         // 1. text
-        String popisText="";
+        String popisText = "";
         try {
             popisText = page.select("html body div.sirka table tbody tr td table tbody tr td div.popis").text();
             novy.setText(popisText.replaceAll("'", ""));
@@ -133,8 +144,8 @@ class UrlCrawler implements Runnable {
             }
         }
         // 3. meno
-        try {
-            String meno = page.select("html body div.sirka table tbody tr td table tbody tr td.listal table tbody tr td b a").text();
+        try { //                       html body div.sirka table tbody tr td table tbody tr td.listadvlevo table tbody tr td b a
+            String meno = page.select("html body div.sirka table tbody tr td table tbody tr td.listadvlevo table tbody tr td b a").text();// old: html body div.sirka table tbody tr td table tbody tr td.listal table tbody tr td b a
             novy.setMeno(meno.replaceAll("'", ""));
             if (novy.getMeno().length() == 0) {
                 throw new RuntimeException("nenasla sa meno");
@@ -148,8 +159,8 @@ class UrlCrawler implements Runnable {
             }
         }
         // 4. telefon
-        try {
-            String telefon = page.select("html body div.sirka table tbody tr td table tbody tr td.listal table tbody tr td a").get(1).text();
+        try { //
+            String telefon = page.select("html body div.sirka table tbody tr td table tbody tr td.listadvlevo table tbody tr td a").get(1).text();// old: html body div.sirka table tbody tr td table tbody tr td.listal table tbody tr td a
             novy.setTelefon(telefon.replaceAll("'", ""));
             if (novy.getTelefon().length() == 0) {
                 throw new RuntimeException("nenasla sa telefon");
@@ -164,7 +175,7 @@ class UrlCrawler implements Runnable {
         }
         // 5. lokalita
         try {
-            String lokalita = page.select("html body div.sirka table tbody tr td table tbody tr td.listal table tbody tr td a").get(2).text();
+            String lokalita = page.select("html body div.sirka table tbody tr td table tbody tr td.listadvlevo table tbody tr td a").get(2).text();
             novy.setLokalita(getOkresneMesto(lokalita));
             if (novy.getLokalita().length() == 0) {
                 throw new RuntimeException("nenasla sa lokalita");
@@ -208,8 +219,8 @@ class UrlCrawler implements Runnable {
             }
         }
         // 8. cena
-        try {
-            String cena = page.select("html body div.sirka table tbody tr td table tbody tr td.listal table tbody tr td b").get(1).text();
+        try { //html body div.sirka table tbody tr td table tbody tr td.listadvlevo table tbody tr td b
+            String cena = page.select("html body div.sirka table tbody tr td table tbody tr td.listadvlevo table tbody tr td b").get(1).text(); //old: html body div.sirka table tbody tr td table tbody tr td.listal table tbody tr td b
             novy.setCena(cena.replaceAll("'", ""));
             if (novy.getCena().length() == 0) {
                 throw new RuntimeException("nenasla sa cena");

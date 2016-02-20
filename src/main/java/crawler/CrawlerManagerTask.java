@@ -19,6 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 
 /**
@@ -306,16 +307,38 @@ public class CrawlerManagerTask implements Runnable {
 
     private int[] getInzeratovZa24hodin(Kategoria kategoria) {
         System.out.println("CrawlerManagerTask getInzeratovZa24hodin=" + kategoria.url);
-        Document page = jsoup.getPage(kategoria.url);
+        Document page = null;
+        try {
+            page = jsoup.getPage(kategoria.url);
+        } catch (Status400Exception ex) {
+            try {
+                zaloguj("nepodarilo sa ziskat url[" + kategoria.url + "] a zistit pocet inzeratov za 24 hodin, pricina: " + ex, true);
+            } catch (InterruptedException ex1) {
+                Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+            Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
+        }
         String source = page.select("html body div.sirka").text();
         String searchPhrase = kategoria.searchPhraseVsetko;
         String searchPhrase2 = kategoria.searchPhraseDnes;
-        int dnesnych = Integer.parseInt(source.substring(source.indexOf(searchPhrase2) + searchPhrase2.length()).trim());
+        int dnesnych = 0;
+        try {
+            dnesnych = Integer.parseInt(source.substring(source.indexOf(searchPhrase2) + searchPhrase2.length()).trim());
+        } catch (NumberFormatException ex) {
+            Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //System.out.println("dnesnych: " + dnesnych);
 
         int cisloStartIdx = source.indexOf(searchPhrase) + searchPhrase.length();
         int cisloEndIdx = cisloStartIdx + source.substring(cisloStartIdx).indexOf(",");
-        int vsetkych = Integer.parseInt(source.substring(cisloStartIdx, cisloEndIdx).trim());
+        int vsetkych = 0;
+        try {
+            vsetkych = Integer.parseInt(source.substring(cisloStartIdx, cisloEndIdx).trim());
+        } catch (NumberFormatException ex) {
+            Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //System.out.println("crawlerHlada: " + crawlerHlada);
         return new int[]{dnesnych, vsetkych};
     }
@@ -396,20 +419,30 @@ public class CrawlerManagerTask implements Runnable {
     }
 
     public static void main(String[] args) {
-//        MysqlDatabase db = new MysqlDatabase();
-        CrawlerManagerTask cm = new CrawlerManagerTask(new TextDatabase(), 1);
-//        MysqlDatabase mysqlDB=new MysqlDatabase();
-//        // cm.execute();
-//        //Shared.db.updateSurneInzeratyAktualnyCas();
-//        Document page = cm.jsoup.getPage("http://deti.bazos.sk/inzerat/56428074/Detske-elektricke-auticko-JEEP-2-motory--2-baterky.php");
-//        cm.parseInzerat(page, new Inzerat(), null);
-//        
-//        StringBuilder sql = new StringBuilder();
-//        int packet_size=500;
-        for (int j = 0; j < cm.kategorie.size(); j++) {
-            Kategoria kat = cm.kategorie.get(j);
-            Shared.db.getInzeratyUrls(kat);
+        JSoup jsoup = new JSoup();
+        try {
+            jsoup.getPage("http://ostatne.bazos.sk/inzerat/58540034/Thailand.php");
+        } catch (Status400Exception ex) {
+            System.out.println("inzerat pravdepodobne neexistuje, pricina: " + ex);
+            Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println("nepodarilo sa ziskat url, pricina: " + ex);
+            Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        MysqlDatabase db = new MysqlDatabase();
+//        CrawlerManagerTask cm = new CrawlerManagerTask(new TextDatabase(), 1);
+////        MysqlDatabase mysqlDB=new MysqlDatabase();
+////        // cm.execute();
+////        //Shared.db.updateSurneInzeratyAktualnyCas();
+////        Document page = cm.jsoup.getPage("http://deti.bazos.sk/inzerat/56428074/Detske-elektricke-auticko-JEEP-2-motory--2-baterky.php");
+////        cm.parseInzerat(page, new Inzerat(), null);
+////        
+////        StringBuilder sql = new StringBuilder();
+////        int packet_size=500;
+//        for (int j = 0; j < cm.kategorie.size(); j++) {
+//            Kategoria kat = cm.kategorie.get(j);
+//            Shared.db.getInzeratyUrls(kat);
+//        }
 //            //System.out.println(kat.url+" = ["+kat.url.replace("http://", "").replace(".bazos.sk", "")+"] ");
 //            System.out.println("delete from Inzeraty_"+kat.nazov+";");
 ////            try {

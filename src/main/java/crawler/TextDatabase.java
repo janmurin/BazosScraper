@@ -322,7 +322,7 @@ public class TextDatabase {
 
     }
 
-    synchronized void deleteInzeratyWithURL(Set<String> toDeleteURLs, String url) {
+    public synchronized void deleteInzeratyWithURL(Set<String> toDeleteURLs, String url) {
         if (toDeleteURLs.isEmpty()) {
             return;
         }

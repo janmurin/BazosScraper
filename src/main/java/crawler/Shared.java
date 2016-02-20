@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Shared {
 
-    static TextDatabase db;
+    public static TextDatabase db;
     static BlockingQueue<CrawlerUloha> urlsToAnalyze;
     static BlockingQueue<SearcherTask> searcherTasks;
     public static AtomicInteger crawlerNasiel = new AtomicInteger(0);

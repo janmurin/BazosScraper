@@ -22,6 +22,7 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
@@ -44,6 +46,9 @@ public class MainForm extends javax.swing.JFrame {
     private final TextDatabase database;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public int inzeratyPocet;
+    private String vybranyDatum;
+    private final String aktualnyDatum;
+    private final SimpleDateFormat sdf2;
 
     /**
      * Creates new form MainForm
@@ -94,6 +99,7 @@ public class MainForm extends javax.swing.JFrame {
                 @Override
                 protected void done() {
                     nastavButtony(true);
+
                 }
 
             };
@@ -101,6 +107,21 @@ public class MainForm extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(rootPane, "vynimka: " + e);
         }
+
+        // initneme poslednych 30 dni na mazanie
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date(System.currentTimeMillis()));
+        sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+        this.aktualnyDatum = sdf2.format(c.getTime());
+        System.out.println("aktualny datum: " + aktualnyDatum);
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        for (int i = 0; i < 30; i++) {
+            c.add(Calendar.DATE, -1);
+            System.out.println("novy datum: " + sdf2.format(c.getTime()));
+            model.addElement(sdf2.format(c.getTime()));
+        }
+        datumComboBox.setModel(model);
+        datumComboBox.setSelectedIndex(0);
     }
 
     /**
@@ -128,11 +149,15 @@ public class MainForm extends javax.swing.JFrame {
         uloha2Button = new javax.swing.JButton();
         poslednaKontrolaLabel = new javax.swing.JLabel();
         inzeratovVDBLabel = new javax.swing.JLabel();
+        mazanieDBButton = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        datumComboBox = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MainForm");
 
         spustiButton.setText("Aktualizovat DB");
+        spustiButton.setEnabled(false);
         spustiButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 spustiButtonActionPerformed(evt);
@@ -236,13 +261,29 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(uloha2Button)
-                .addContainerGap(106, Short.MAX_VALUE))
+                .addComponent(uloha2Button))
         );
 
         poslednaKontrolaLabel.setText("Posledná kontrola aktuálnosti: 22.12.2015");
 
         inzeratovVDBLabel.setText("Inzerátov v DB: 700 000");
+
+        mazanieDBButton.setText("mazanie inzeratov");
+        mazanieDBButton.setEnabled(false);
+        mazanieDBButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mazanieDBButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setText("Zadajte datum od ktoreho treba zmazat inzeraty:");
+
+        datumComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        datumComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                datumComboBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -251,23 +292,27 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(datumComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(mazanieDBButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE))))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(spustiButton)
-                                .addGap(18, 18, 18)
+                                .addGap(23, 23, 23)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(poslednaKontrolaLabel)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(poslednyUpdateLabel)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(inzeratovVDBLabel)
-                                        .addGap(27, 27, 27)))))
+                                        .addComponent(inzeratovVDBLabel)))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -279,17 +324,21 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(spustiButton)
                     .addComponent(poslednyUpdateLabel)
                     .addComponent(inzeratovVDBLabel))
-                .addGap(2, 2, 2)
+                .addGap(6, 6, 6)
                 .addComponent(poslednaKontrolaLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(16, 16, 16)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(datumComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(mazanieDBButton)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -384,6 +433,7 @@ public class MainForm extends javax.swing.JFrame {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                mazanieDBButton.setEnabled(true);
             }
 
         };
@@ -542,6 +592,118 @@ public class MainForm extends javax.swing.JFrame {
         System.out.println("logWorker executed");
     }//GEN-LAST:event_uloha2ButtonActionPerformed
 
+    private void mazanieDBButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mazanieDBButtonActionPerformed
+        vybranyDatum = (String) datumComboBox.getSelectedItem();
+        System.out.println("mazem z databazy inzeraty od datumu: " + vybranyDatum);
+        nastavButtony(false);
+        Shared.logMessages = new LinkedBlockingQueue<>();
+        SwingWorker<Void, String> aktualizaciaWorker = new SwingWorker<Void, String>() {
+
+//            public void zaloguj(String message, boolean poslatGui) throws InterruptedException {
+//                System.out.println(message);
+//                if (poslatGui) {
+//                    try {
+//                        Shared.logMessages.put(message);
+//                    } catch (InterruptedException ex) {
+//                        //Logger.getLogger(UrlSearcher.class.getName()).log(Level.SEVERE, null, ex);
+//                        throw ex;
+//                    }
+//                }
+//            }
+            @Override
+            protected Void doInBackground() throws Exception {
+                File file = new File(TEXT_DATABASE_DIR);
+                try {
+
+                    Date vybranyDate = sdf2.parse(vybranyDatum);
+                    // 2. prejdeme celu databazu a pytame sa ci je inzerat este aktualny, ak NIE, tak si pridame do zoznamu na zmazanie
+                    for (File subor : file.listFiles()) {
+                        if (subor.getName().contains("data") || subor.getName().contains("okresy")) {
+                            continue;
+                        }
+                        String kategoria = subor.getName().replace(".txt", "").replace("textdb/", "");
+                        publish("\nnacitavam inzeraty z lokal DB pre kategoriu [" + kategoria + "] ");
+                        List<Inzerat> inzeraty = database.getInzeratyList(kategoria);
+                        publish("hladam inzeraty na vymazanie ktore su v datume: " + vybranyDatum + " --> " + aktualnyDatum);
+                        Set<String> toDeleteURLs = new HashSet<String>();
+                        // kontrolujeme inzeraty z databazy ci su este platne
+                        // hladame nas inzerat v nasearchovanom zozname
+                        for (Inzerat inz : inzeraty) {
+                            Date datum = sdf.parse(inz.getDatumInzeratu());
+                            if (datum.after(vybranyDate)) {
+                                toDeleteURLs.add(inz.getAktualny_link());
+                            }
+                        }
+
+                        publish("to delete inzeraty size: " + toDeleteURLs.size());
+                        database.deleteInzeratyWithURL(toDeleteURLs, kategoria);
+                        publish("inzeraty v datumovom intervale " + vybranyDatum + " --> " + aktualnyDatum + " ZMAZANE");
+                    }
+                } catch (Exception e) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, e);
+                }
+                return null;
+            }
+
+            @Override
+            protected void process(List<String> chunks) {
+                for (String str : chunks) {
+                    zapisDoLogu(str);
+                }
+            }
+
+            @Override
+            protected void done() {
+                nastavButtony(true);
+                try {
+                    Shared.logMessages.put("poison.pill");
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+        };
+        aktualizaciaWorker.execute();
+
+        SwingWorker<Void, String> logWorker = new SwingWorker<Void, String>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+                    String message = Shared.logMessages.take();
+                    System.out.println("MainForm logWorker: prvy message prijaty: " + message);
+                    while (message != null) {
+                        if (message.equals("poison.pill")) {
+                            break;
+                        }
+                        //System.out.println("publishujem message: " + message);
+                        publish(message);
+                        message = Shared.logMessages.take();
+                    }
+                    System.out.println("MainForm logWorker: ziadne dalsie message");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(rootPane, "MainForm vynimka: " + ex);
+                    Logger.getLogger(AktualizaciaFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return null;
+            }
+
+            @Override
+            protected void process(List<String> chunks) {
+                for (String m : chunks) {
+                    zapisDoLogu(m);
+                }
+            }
+
+        };
+        logWorker.execute();
+        System.out.println("logWorker executed");
+
+    }//GEN-LAST:event_mazanieDBButtonActionPerformed
+
+    private void datumComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_datumComboBoxActionPerformed
+
+    }//GEN-LAST:event_datumComboBoxActionPerformed
+
     private void zapisDoLogu(String text) {
         //System.out.println(text);
         logTextArea.append(text + "\n");
@@ -585,8 +747,10 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> datumComboBox;
     private javax.swing.JLabel inzeratovVDBLabel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -597,6 +761,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextArea klucoveSlovaTextArea;
     private javax.swing.JTextArea logTextArea;
+    private javax.swing.JButton mazanieDBButton;
     private javax.swing.JLabel poslednaKontrolaLabel;
     private javax.swing.JLabel poslednyUpdateLabel;
     private javax.swing.JButton spustiButton;
@@ -607,5 +772,7 @@ public class MainForm extends javax.swing.JFrame {
     private void nastavButtony(boolean b) {
         uloha1Button.setEnabled(b);
         uloha2Button.setEnabled(b);
+        mazanieDBButton.setEnabled(b);
+        spustiButton.setEnabled(b);
     }
 }

@@ -115,7 +115,17 @@ class UrlSearcher implements Runnable {
 
                 String currentLink = searcherTask.kategoria.url + "/" + (i) + "/";
                 //System.out.println("getting: "+currentLink);
-                Document doc = jsoup.getPage(currentLink);
+                Document doc = null;
+                try {
+                    doc = jsoup.getPage(currentLink);
+                } catch (Status400Exception ex) {
+                    zaloguj("crawler " + this.id + " CHYBNY STAV  url: " + currentLink + " pricina: " + ex, true);
+                    continue;
+                } catch (Exception ex) {
+                    zaloguj("crawler " + this.id + " NEPODARILO SA ZISKAT STRANKU: " + currentLink + " pricina: " + ex, true);
+                    continue;
+                }
+                // pre istotu necham aj tuto podmienku
                 if (doc == null) {
                     zaloguj("SEARCHER " + id + ": NEPODARILO SA ZISKAT STRANKU: " + currentLink, true);
                     continue;
