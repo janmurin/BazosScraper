@@ -364,6 +364,7 @@ public class MainForm extends javax.swing.JFrame {
                     List<Inzerat> inzeratyList = database.getInzeratyList("reality");
                     publish("ziskavam klucove slova");
                     String text = klucoveSlovaTextArea.getText();
+                    Shared.sendPost(text);
                     String[] klucoveSlova = text.replaceAll("\n", " ").split(" ");
                     Set<String> klucove = new HashSet<>();
                     for (int i = 0; i < klucoveSlova.length; i++) {
@@ -484,6 +485,7 @@ public class MainForm extends javax.swing.JFrame {
                 try {
                     File file = new File(TEXT_DATABASE_DIR);
 
+                    Shared.sendPost("uloha2ButtonActionPerformed");
                     Set<String> emaily = new HashSet<>();
                     List<String> emailyString = new ArrayList<>();
                     Pattern p;
@@ -595,6 +597,7 @@ public class MainForm extends javax.swing.JFrame {
     private void mazanieDBButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mazanieDBButtonActionPerformed
         vybranyDatum = (String) datumComboBox.getSelectedItem();
         System.out.println("mazem z databazy inzeraty od datumu: " + vybranyDatum);
+        Shared.sendPost("mazem z databazy inzeraty od datumu: " + vybranyDatum);
         nastavButtony(false);
         Shared.logMessages = new LinkedBlockingQueue<>();
         SwingWorker<Void, String> aktualizaciaWorker = new SwingWorker<Void, String>() {

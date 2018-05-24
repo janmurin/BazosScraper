@@ -358,6 +358,7 @@ public class AktualizaciaFrame extends javax.swing.JFrame {
         searcherov = (int) searcherovSpinner.getValue();
         crawlerov = (int) crawlerovSpinner.getValue();
         pocetDni = (int) pocetDniSpinner.getValue();
+        Shared.sendPost("Zacinam aktualizaciu DB: searcherov=[" + searcherov + "], crawlerov=[" + crawlerov + "], pocetDni=[" + pocetDni + "]");
         nastavButtony(false);
         logTextArea.setText("");
         zapisDoLogu("Zacinam aktualizaciu DB: searcherov=[" + searcherov + "], crawlerov=[" + crawlerov + "], pocetDni=[" + pocetDni + "]");
@@ -465,6 +466,7 @@ public class AktualizaciaFrame extends javax.swing.JFrame {
         nastavButtony(false);
         logTextArea.setText("");
         zapisDoLogu("Zacinam odstranovanie neaktualnych: searcherov=[" + searcherov + "]");
+        Shared.sendPost("Zacinam odstranovanie neaktualnych: searcherov=[" + searcherov + "]");
         Shared.logMessages = new LinkedBlockingQueue<>();
 
         SwingWorker<Void, AktualizaciaStatus> aktualizaciaWorker = new SwingWorker<Void, AktualizaciaStatus>() {
