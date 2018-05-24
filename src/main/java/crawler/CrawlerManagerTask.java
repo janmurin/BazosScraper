@@ -21,6 +21,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
@@ -104,7 +106,8 @@ public class CrawlerManagerTask implements Runnable {
                 }
                 Shared.searcherHlada.addAndGet(pocet);
                 Shared.searcherTasks.put(new SearcherTask(kategoria, 1, pocet, aktualizujeme));
-                zaloguj("" + Shared.searcherHlada.get(), true);
+                zaloguj("Kategoria: " + kategoria.nazov + " vsetkych: " + poctyInzeratov[0] + " dnesnych: " + poctyInzeratov[1] + ". "
+                        + "Celkom prehladame: " + Shared.searcherHlada.get(), true);
             }
             zaloguj("vsetkych inzeratov na searchovanie: " + Shared.searcherHlada.get(), true);
             for (int i = 0; i < NUMBER_OF_SEARCHERS; i++) {
@@ -174,7 +177,7 @@ public class CrawlerManagerTask implements Runnable {
             for (Kategoria kategoria : kategorie) {
                 int[] poctyInzeratov = getInzeratovZa24hodin(kategoria);
                 // vypocitame kolko inzeratov treba skontrolovat podla poctu dni a denneho prirastku inzeratov v kategorii na bazosi
-                int pocet = (int) (poctyInzeratov[1]);
+                int pocet = poctyInzeratov[1];
                 Shared.searcherHlada.addAndGet(pocet);
                 int poc = 1;
                 // pridame searcher tasky po davkach
@@ -184,7 +187,7 @@ public class CrawlerManagerTask implements Runnable {
                 if (poc < pocet) {
                     Shared.searcherTasks.put(new SearcherTask(kategoria, poc, pocet - poc, aktualizujeme));
                 }
-                zaloguj("" + Shared.searcherHlada.get(), true);
+                zaloguj("Kategoria: " + kategoria.nazov + " vsetkych: " + poctyInzeratov[0] + " dnesnych: " + poctyInzeratov[1] + ". Celkom prehladame: " + Shared.searcherHlada.get(), true);
             }
             zaloguj("searcher taskov: " + Shared.searcherTasks.size(), true);
             zaloguj("vsetkych inzeratov na searchovanie: " + Shared.searcherHlada.get(), true);
@@ -320,22 +323,22 @@ public class CrawlerManagerTask implements Runnable {
         } catch (Exception ex) {
             Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String source = page.select("html body div.sirka").text();
-        String searchPhrase = kategoria.searchPhraseVsetko;
-        String searchPhrase2 = kategoria.searchPhraseDnes;
+        Elements ems = page.select("div[align=\"left\"] b");
+//        String searchPhrase = kategoria.searchPhraseVsetko;
+//        String searchPhrase2 = kategoria.searchPhraseDnes;
         int dnesnych = 0;
         try {
-            dnesnych = Integer.parseInt(source.substring(source.indexOf(searchPhrase2) + searchPhrase2.length()).trim());
+            dnesnych = Integer.parseInt(ems.get(1).text());
         } catch (NumberFormatException ex) {
             Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
         }
         //System.out.println("dnesnych: " + dnesnych);
 
-        int cisloStartIdx = source.indexOf(searchPhrase) + searchPhrase.length();
-        int cisloEndIdx = cisloStartIdx + source.substring(cisloStartIdx).indexOf(",");
+//        int cisloStartIdx = source.indexOf(searchPhrase) + searchPhrase.length();
+//        int cisloEndIdx = cisloStartIdx + source.substring(cisloStartIdx).indexOf(",");
         int vsetkych = 0;
         try {
-            vsetkych = Integer.parseInt(source.substring(cisloStartIdx, cisloEndIdx).trim());
+            vsetkych = Integer.parseInt(ems.get(2).text());
         } catch (NumberFormatException ex) {
             Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -421,7 +424,20 @@ public class CrawlerManagerTask implements Runnable {
     public static void main(String[] args) {
         JSoup jsoup = new JSoup();
         try {
-            jsoup.getPage("http://ostatne.bazos.sk/inzerat/58540034/Thailand.php");
+            Document page = jsoup.getPage("https://auto.bazos.sk/inzerat/66550277/Skoda-fabia-combi-12-47kw-12V-111tiskm-Super-stav.php");
+            Elements listal = page.select(".listal");
+            Elements nadpisy = listal.select("div.nadpismenu");
+            Elements barvy = listal.select("div.barvalmenu");
+            String typ = "NEZISTENE";
+
+            for (int i = 0; i < nadpisy.size(); i++) {
+                Elements select = barvy.get(i).select("#zvyraznenikat");
+                if (select.size() > 0) {
+                    typ = nadpisy.get(i).text();
+                    break;
+                }
+            }
+            System.out.println("typ=" + typ);
         } catch (Status400Exception ex) {
             System.out.println("inzerat pravdepodobne neexistuje, pricina: " + ex);
             Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);

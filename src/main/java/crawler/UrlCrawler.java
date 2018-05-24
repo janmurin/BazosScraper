@@ -15,6 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
@@ -190,7 +192,19 @@ class UrlCrawler implements Runnable {
         }
         // 6. typ
         try {
-            String typ = page.select("div.barvalevat a#zvyraznenikat").text();
+            Elements listal = page.select(".listal");
+            Elements nadpisy = listal.select("div.nadpismenu");
+            Elements barvy = listal.select("div.barvalmenu");
+            String typ = "";
+
+            for (int i = 0; i < nadpisy.size(); i++) {
+                Elements select = barvy.get(i).select("#zvyraznenikat");
+                if (select.size() > 0) {
+                    typ = nadpisy.get(i).text();
+                    break;
+                }
+            }
+            //System.out.println("typ="+typ);
             novy.setTyp(typ.replaceAll("'", ""));
             if (novy.getTyp().length() == 0) {
                 throw new RuntimeException("nenasla sa typ");
@@ -205,7 +219,7 @@ class UrlCrawler implements Runnable {
         }
         // 7. kategoria
         try {
-            String kategoria = page.select("div.barvaleva a#zvyraznenikat").text();
+            String kategoria = page.select("#zvyraznenikat").text();
             novy.setKategoria(kategoria.replaceAll("'", ""));
             if (novy.getKategoria().length() == 0) {
                 throw new RuntimeException("nenasla sa kategoria");

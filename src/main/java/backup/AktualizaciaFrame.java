@@ -85,9 +85,12 @@ public class AktualizaciaFrame extends javax.swing.JFrame {
         if (diffDni < 1) {
             diffDni = 1;
         }
-        searcherovSpinner.setModel(new SpinnerNumberModel(2, 1, 10, 1));
+        if (diffDni > 365) {
+            diffDni = 365;
+        }
+        searcherovSpinner.setModel(new SpinnerNumberModel(1, 1, 10, 1));
         odstranitSearcherovSpinner.setModel(new SpinnerNumberModel(20, 1, 20, 1));
-        crawlerovSpinner.setModel(new SpinnerNumberModel(12, 1, 30, 1));
+        crawlerovSpinner.setModel(new SpinnerNumberModel(6, 1, 30, 1));
         pocetDniSpinner.setModel(new SpinnerNumberModel(diffDni, 1, 365, 1));
         addWindowListener(new WindowAdapter() {
             @Override
