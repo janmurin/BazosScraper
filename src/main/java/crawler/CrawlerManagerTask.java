@@ -106,7 +106,7 @@ public class CrawlerManagerTask implements Runnable {
                 }
                 Shared.searcherHlada.addAndGet(pocet);
                 Shared.searcherTasks.put(new SearcherTask(kategoria, 1, pocet, aktualizujeme));
-                zaloguj("Kategoria: " + kategoria.nazov + " vsetkych: " + poctyInzeratov[0] + " dnesnych: " + poctyInzeratov[1] + ". "
+                zaloguj("Kategoria: " + kategoria.nazov + " vsetkych: " + poctyInzeratov[1] + " dnesnych: " + poctyInzeratov[0] + ". "
                         + "Celkom prehladame: " + Shared.searcherHlada.get(), true);
             }
             zaloguj("vsetkych inzeratov na searchovanie: " + Shared.searcherHlada.get(), true);
@@ -187,7 +187,7 @@ public class CrawlerManagerTask implements Runnable {
                 if (poc < pocet) {
                     Shared.searcherTasks.put(new SearcherTask(kategoria, poc, pocet - poc, aktualizujeme));
                 }
-                zaloguj("Kategoria: " + kategoria.nazov + " vsetkych: " + poctyInzeratov[0] + " dnesnych: " + poctyInzeratov[1] + ". Celkom prehladame: " + Shared.searcherHlada.get(), true);
+                zaloguj("Kategoria: " + kategoria.nazov + " vsetkych: " + poctyInzeratov[1] + " dnesnych: " + poctyInzeratov[0] + ". Celkom prehladame: " + Shared.searcherHlada.get(), true);
             }
             zaloguj("searcher taskov: " + Shared.searcherTasks.size(), true);
             zaloguj("vsetkych inzeratov na searchovanie: " + Shared.searcherHlada.get(), true);
@@ -328,7 +328,7 @@ public class CrawlerManagerTask implements Runnable {
 //        String searchPhrase2 = kategoria.searchPhraseDnes;
         int dnesnych = 0;
         try {
-            dnesnych = Integer.parseInt(ems.get(1).text());
+            dnesnych = Integer.parseInt(ems.get(2).text());
         } catch (NumberFormatException ex) {
             Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -338,7 +338,7 @@ public class CrawlerManagerTask implements Runnable {
 //        int cisloEndIdx = cisloStartIdx + source.substring(cisloStartIdx).indexOf(",");
         int vsetkych = 0;
         try {
-            vsetkych = Integer.parseInt(ems.get(2).text());
+            vsetkych = Integer.parseInt(ems.get(1).text());
         } catch (NumberFormatException ex) {
             Logger.getLogger(CrawlerManagerTask.class.getName()).log(Level.SEVERE, null, ex);
         }
